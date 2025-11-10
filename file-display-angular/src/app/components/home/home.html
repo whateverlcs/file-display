@@ -1,0 +1,28 @@
+<!-- app.html -->
+<body class="bg-gray-900 text-white m-0 h-screen flex overflow-hidden">
+  <app-sidebar
+    [pastas]="pastas"
+    [subpastas]="subpastas"
+    [arquivoPrincipal]="arquivoPrincipal"
+    (onPastaSelecionada)="onPastaSelecionada($event)"
+    (onSubpastaSelecionada)="onSubpastaSelecionada($event)"
+    (onArquivoSelect)="mudarArquivo($event)"
+    (onMarkAssistido)="marcarComoAssistido()"
+    (onRealizarLogout)="realizarLogout()"
+    (onSidebarToggle)="onSidebarToggle($event)"
+  >
+  </app-sidebar>
+
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div class="flex-1 bg-black min-h-0">
+      <app-main-video *ngIf="arquivoPrincipal" [arquivo]="arquivoPrincipal"></app-main-video>
+
+      <div
+        *ngIf="!arquivoPrincipal"
+        class="w-full h-full flex items-center justify-center text-gray-400"
+      >
+        Selecione uma pasta e um arquivo para visualizar
+      </div>
+    </div>
+  </main>
+</body>

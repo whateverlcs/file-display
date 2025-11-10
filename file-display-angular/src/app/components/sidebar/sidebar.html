@@ -1,0 +1,129 @@
+<!-- sidebar.html -->
+
+<aside *ngIf="!isCollapsed" class="w-80 bg-gray-800 h-full flex flex-col">
+  <div class="flex-shrink-0 p-4 border-b border-gray-700 flex items-center justify-between">
+    <h2 class="text-xl font-bold">File Display</h2>
+    <button (click)="toggleSidebar()" class="p-2 rounded hover:bg-gray-700 transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-2">Pasta Principal</label>
+      <select
+        [(ngModel)]="pastaSelecionadaValue"
+        (change)="onPastaChange()"
+        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Selecione a pasta principal</option>
+        <option *ngFor="let pasta of pastas; trackBy: trackByCaminho" [value]="pasta.caminho">
+          {{ pasta.nome }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="subpastas.length > 0">
+      <label class="block text-sm font-medium text-gray-300 mb-2">Subpasta</label>
+      <select
+        [(ngModel)]="subpastaSelecionadaValue"
+        (change)="onSubpastaChange()"
+        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Selecione a subpasta</option>
+        <option
+          *ngFor="let subpasta of subpastas; trackBy: trackByCaminho"
+          [value]="subpasta.caminho"
+        >
+          {{ subpasta.nome }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="arquivoPrincipal" class="mt-4">
+      <button
+        (click)="emitirMarkAssistido()"
+        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Marcar como Visto
+      </button>
+    </div>
+
+    <div *ngIf="subpastaSelecionadaValue && arquivosDaSubpasta.length > 0" class="mt-4">
+      <h3 class="text-lg font-medium text-gray-300 mb-3">
+        Arquivos ({{ arquivosDaSubpasta.length }})
+      </h3>
+      <div class="space-y-2">
+        <div
+          *ngFor="let arquivo of arquivosDaSubpasta; trackBy: trackByCaminho"
+          class="cursor-pointer p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+          (click)="selecionarArquivo(arquivo)"
+        >
+          <div class="flex items-center space-x-3">
+            <div [class]="getIconClasses(arquivo)">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  *ngIf="arquivo.tipo === 'video'"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                ></path>
+                <path
+                  *ngIf="arquivo.tipo !== 'video'"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium truncate">{{ arquivo.nome }}</p>
+              <p class="text-xs text-gray-400 capitalize">{{ arquivo.tipo }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="subpastaSelecionadaValue && arquivosDaSubpasta.length === 0"
+      class="text-center text-gray-400 py-8"
+    >
+      Nenhum arquivo encontrado nesta subpasta
+    </div>
+
+    <div class="mt-4">
+      <button
+        (click)="emitirRealizarLogout()"
+        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Sair
+      </button>
+    </div>
+  </div>
+</aside>
+
+<button
+  *ngIf="isCollapsed"
+  (click)="toggleSidebar()"
+  class="fixed top-1 left-4 z-50 p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors shadow-lg"
+>
+  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M4 6h16M4 12h16M4 18h16"
+    ></path>
+  </svg>
+</button>

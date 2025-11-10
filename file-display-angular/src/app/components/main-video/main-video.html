@@ -1,0 +1,46 @@
+<!-- main-video.component.html -->
+<div *ngIf="arquivo" class="w-full h-full bg-black flex flex-col">
+  <!-- Vídeo -->
+  <div *ngIf="isVideo()" class="w-full h-full">
+    <video class="w-full h-full object-contain" controls [src]="getArquivoUrl()"></video>
+  </div>
+
+  <!-- PDF -->
+  <div *ngIf="isPdf()" class="w-full h-full flex flex-col">
+    <div class="bg-gray-800 p-4 border-b border-gray-700 flex-shrink-0">
+      <h3 class="text-white font-medium text-center truncate">{{ arquivo.nome }}</h3>
+    </div>
+
+    <div class="flex-1 bg-white overflow-auto">
+      <div *ngIf="!isLoaded" class="flex items-center justify-center h-full bg-gray-900">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          <p class="text-white mt-2">Carregando PDF...</p>
+        </div>
+      </div>
+
+      <pdf-viewer
+        *ngIf="!isLoaded || isLoaded"
+        [src]="pdfSrc"
+        [render-text]="true"
+        [show-all]="true"
+        [original-size]="false"
+        [fit-to-page]="true"
+        (after-load-complete)="afterLoadComplete($event)"
+        (error)="onError($event)"
+        style="display: block; width: 100%; min-height: 100%"
+      ></pdf-viewer>
+    </div>
+  </div>
+
+  <div
+    *ngIf="!isVideo() && !isPdf()"
+    class="w-full h-full flex items-center justify-center text-white"
+  >
+    <div class="text-center">
+      <div class="text-4xl mb-4">📄</div>
+      <p class="text-xl">Visualização não disponível</p>
+      <p class="text-gray-400 mt-2">Tipo de arquivo: {{ arquivo.tipo }}</p>
+    </div>
+  </div>
+</div>

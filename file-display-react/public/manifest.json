@@ -1,0 +1,15 @@
+{
+  "short_name": "PDFReader",
+  "name": "PDF Reader Web App",
+  "icons": [
+    {
+      "src": "favicon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#1e1e1e",
+  "theme_color": "#4f94f7",
+  "display": "standalone"
+}
