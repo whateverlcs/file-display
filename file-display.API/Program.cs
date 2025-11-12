@@ -1,6 +1,10 @@
+using filedisplay.API.Models;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<FileStorageConfig>(
+    builder.Configuration.GetSection("FileStorage"));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -8,14 +12,16 @@ builder.Services.AddSwaggerGen();
 
 var frontendUrlReact = builder.Configuration["Frontend:UrlReact"];
 var frontendUrlAngular = builder.Configuration["Frontend:UrlAngular"];
+var localfrontendUrlReact = builder.Configuration["Frontend:LocalhostReact"];
+var localfrontendUrlAngular = builder.Configuration["Frontend:LocalhostAngular"];
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins( //caminhos permitidos, no qual podem ser locais ou IPs
-            "http://localhost:3000",
-            "http://localhost:4200",
+        policy.WithOrigins(
+            localfrontendUrlReact!,
+            localfrontendUrlAngular!,
             frontendUrlReact!,
             frontendUrlAngular!)
               .AllowAnyHeader()
@@ -27,24 +33,20 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.UseCors();
 
-//Caminhos para acessar as pastas de arquivos, esse é o caminho fixo 1 (Veja o Controller para mais informações)
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(@""),
-    RequestPath = "" //como o caminho fixo 1 é D:\ então o request path é /arquivos/d
-});
+var config = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<FileStorageConfig>>().Value;
 
-//Caminhos para acessar as pastas de arquivos, esse é o caminho fixo 2 (Veja o Controller para mais informações)
-app.UseStaticFiles(new StaticFileOptions
+foreach (var rootPath in config.RootPaths)
 {
-    FileProvider = new PhysicalFileProvider(@""),
-    RequestPath = "" //como o caminho fixo 1 é E:\ então o request path é /arquivos/e
-});
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(rootPath.PhysicalPath),
+        RequestPath = rootPath.UrlPrefix
+    });
+}
 
 app.MapControllers();
 

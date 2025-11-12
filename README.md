@@ -17,7 +17,7 @@ Um projeto fullstack, contando com uma API e duas versões do frontend, um em Re
 
 1. Clone o repositório: `git clone https://github.com/whateverlcs/file-display`.
 2. Acesse `file-display.API`
-3. Defina alguns parametros, como as 2 pastas fixas que será monitorada em Program e Controller, defina as subpastas a serem monitoradas no Controller e preencha as URLs do front no appSettings
+3. Defina alguns parametros, preenchendo as URLs do front e as pastas a serem observadas no appSettings
 4. Rode o Projeto.
 5. Escolha um dos projetos em front-end, seja React ou Angular.
 6. Ajuste a URL da API nos projetos de Front-end e adicione um login para acessar.

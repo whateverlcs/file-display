@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using filedisplay.API.Models;
+﻿using filedisplay.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.IO;
 
 namespace filedisplay.API.Controllers
@@ -8,11 +9,14 @@ namespace filedisplay.API.Controllers
     [Route("api/[controller]")]
     public class FilesController : ControllerBase
     {
-        // Definição das pastas principais, podem ser varias, dentro de dois caminhos fixos
-        private readonly string[] pastasPrincipais = new string[]
+        private readonly FileStorageConfig _config;
+
+        public FilesController(IOptions<FileStorageConfig> config)
         {
-            @"",
-        };
+            _config = config.Value;
+        }
+
+        private string[] pastasPrincipais => _config.ContentFolders.ToArray();
 
         [HttpPost("mark-assistido")]
         public async Task<IActionResult> MarkAssistido([FromBody] AssistidoRequest request)
@@ -112,36 +116,28 @@ namespace filedisplay.API.Controllers
             };
         }
 
-        // Função auxiliar para criar objeto Arquivo
-        private Arquivo CriarArquivo(string f)
+        private Arquivo CriarArquivo(string filePath)
         {
-            string urlPrefix;
-            string rootPath;
+            string urlPrefix = "/";
+            string rootPath = Path.GetDirectoryName(filePath) + "\\";
 
-            // é verificado duas pastas principais
-            if (f.StartsWith(@"", StringComparison.OrdinalIgnoreCase)) //pasta principal 1
+            // Encontra a raiz configurada que corresponde ao arquivo
+            var matchingRoot = _config.RootPaths
+                .FirstOrDefault(r => filePath.StartsWith(r.PhysicalPath, StringComparison.OrdinalIgnoreCase));
+
+            if (matchingRoot != null)
             {
-                urlPrefix = ""; //prefixo de URL para acessar arquivos dessa pasta, como é disco D: então o prefixo é /arquivos/d/
-                rootPath = @""; //pasta principal 1
-            }
-            else if (f.StartsWith(@"", StringComparison.OrdinalIgnoreCase)) //pasta principal 2
-            {
-                urlPrefix = ""; //prefixo de URL para acessar arquivos dessa pasta, como é disco E: então o prefixo é /arquivos/e/
-                rootPath = @""; //pasta principal 2
-            }
-            else
-            {
-                urlPrefix = "/";
-                rootPath = Path.GetDirectoryName(f) + "\\";
+                urlPrefix = matchingRoot.UrlPrefix + "/";
+                rootPath = matchingRoot.PhysicalPath;
             }
 
-            string caminhoPublico = urlPrefix + f.Substring(rootPath.Length).Replace("\\", "/");
+            string caminhoPublico = urlPrefix + filePath.Substring(rootPath.Length).Replace("\\", "/");
 
             return new Arquivo
             {
-                Nome = Path.GetFileName(f),
+                Nome = Path.GetFileName(filePath),
                 Caminho = caminhoPublico,
-                Tipo = Path.GetExtension(f).ToLower() == ".pdf" ? "pdf" : "video"
+                Tipo = Path.GetExtension(filePath).ToLower() == ".pdf" ? "pdf" : "video"
             };
         }
     }
